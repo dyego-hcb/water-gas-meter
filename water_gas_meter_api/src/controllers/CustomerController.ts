@@ -60,8 +60,9 @@ class CustomerController {
 
     static async createCustomer(req: Request, res: Response) {
         const { customer_code } = req.body;
-        if (!customer_code) {
-            return res.status(400).send('Customer code is required');
+
+        if (!customer_code || typeof customer_code !== 'string') {
+            return res.status(400).send('Customer code is required and must be a string');
         }
 
         const data = new CreateCustomerDTO(customer_code);
@@ -77,13 +78,14 @@ class CustomerController {
     static async updateCustomer(req: Request, res: Response) {
         const { id } = req.params;
         const idNumber = parseInt(id, 10);
+
         if (isNaN(idNumber)) {
             return res.status(400).send('Invalid customer ID');
         }
 
         const { customer_code } = req.body;
-        if (!customer_code) {
-            return res.status(400).send('Customer code is required');
+        if (!customer_code || typeof customer_code !== 'string') {
+            return res.status(400).send('Customer code is required and must be a string');
         }
 
         const data = new UpdateCustomerDTO(customer_code);

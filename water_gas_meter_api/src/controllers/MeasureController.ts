@@ -5,9 +5,15 @@ import { Request, Response } from 'express';
 // SERVICES
 import { MeasureServices } from '../services/MeasureServices';
 
+// MODELS
+import { MeasureType } from '../models/Measure';
+
 // DTOS
 import { CreateMeasureDTO } from '../dtos/measure-dto/CreateMeasureDTO';
 import { UpdateMeasureDTO } from '../dtos/measure-dto/UpdateMeasureDTO';
+
+// UTILS
+import { isValidBase64Image } from '../utils/ValidateBase64Image';
 
 class MeasureController {
 
@@ -43,11 +49,29 @@ class MeasureController {
     }
 
     static async createMeasure(req: Request, res: Response) {
-        const data = req.body as CreateMeasureDTO;
+        const { measure_datetime, measure_type, measure_value, image_url, customerId } = req.body;
 
-        if (!data.customerId) {
-            return res.status(400).send('Customer ID is required');
+        if (!measure_datetime || isNaN(Date.parse(measure_datetime))) {
+            return res.status(400).send('Invalid measure_datetime');
         }
+
+        if (!Object.values(MeasureType).includes(measure_type)) {
+            return res.status(400).send('Invalid measure_type');
+        }
+
+        if (typeof measure_value !== 'number' || isNaN(measure_value)) {
+            return res.status(400).send('Invalid measure_value');
+        }
+
+        if (!image_url || !/^https?:\/\/.+\.(jpg|jpeg|png|gif)$/.test(image_url)) {
+            return res.status(400).send('Invalid image_url');
+        }
+
+        if (isNaN(customerId)) {
+            return res.status(400).send('Invalid customerId');
+        }
+
+        const data = new CreateMeasureDTO(measure_datetime, measure_type, measure_value, image_url, customerId);
 
         try {
             const newMeasure = await MeasureServices.createMeasure(data);
@@ -59,16 +83,36 @@ class MeasureController {
     }
 
     static async updateMeasure(req: Request, res: Response) {
-        const { id } = req.params;
-        const idNumber = parseInt(id);
-        const data = req.body as UpdateMeasureDTO;
-
-        if (isNaN(idNumber)) {
-            return res.status(400).send('Invalid ID format');
+        const id = parseInt(req.params.id, 10);
+        if (isNaN(id)) {
+            return res.status(400).send('Invalid measure ID');
         }
 
+        const { measure_datetime, measure_type, measure_value, image_url, customerId } = req.body;
+
+        if (!measure_datetime || isNaN(Date.parse(measure_datetime))) {
+            return res.status(400).send('Invalid measure_datetime');
+        }
+
+        if (!Object.values(MeasureType).includes(measure_type)) {
+            return res.status(400).send('Invalid measure_type');
+        }
+
+        if (typeof measure_value !== 'number' || isNaN(measure_value)) {
+            return res.status(400).send('Invalid measure_value');
+        }
+
+        if (!image_url || !/^https?:\/\/.+\.(jpg|jpeg|png|gif)$/.test(image_url)) {
+            return res.status(400).send('Invalid image_url');
+        }
+
+        if (isNaN(customerId)) {
+            return res.status(400).send('Invalid customerId');
+        }
+
+        const data = new UpdateMeasureDTO(measure_datetime, measure_type, measure_value, image_url, customerId);
         try {
-            const updatedMeasure = await MeasureServices.updateMeasure(idNumber, data);
+            const updatedMeasure = await MeasureServices.updateMeasure(id, data);
             if (updatedMeasure) {
                 res.status(200).json(updatedMeasure);
             } else {

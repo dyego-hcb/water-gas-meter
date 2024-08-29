@@ -57,6 +57,11 @@ export class CustomerServices {
         }
 
         try {
+            const existingCustomer = await this.customerRepository.findOneBy({ customer_code: data.customer_code });
+            if (existingCustomer) {
+                throw new Error('Customer code already exists');
+            }
+
             const customer = this.customerRepository.create(data);
             const savedCustomer = await this.customerRepository.save(customer);
             return new CustomerResponseDTO(savedCustomer.id as number, savedCustomer.customer_code as string);

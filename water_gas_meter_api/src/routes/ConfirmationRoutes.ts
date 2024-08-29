@@ -5,4 +5,10 @@ import ConfirmationController from '../controllers/ConfirmationController';
 
 const router = express.Router();
 
+router.get('/get-all', ConfirmationController.getAllConfirmation);
+router.get('/get-by-id/:id', ConfirmationController.getConfirmationById);
+router.post('/register', ConfirmationController.createConfirmation);
+router.put('/edit/:id', ConfirmationController.updateConfirmation);
+router.delete('/delete/:id', ConfirmationController.deleteConfirmation);
+
 export default router;
