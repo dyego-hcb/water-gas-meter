@@ -2,13 +2,21 @@
 
 import express from 'express';
 import { ConnDB } from './db/ConnDB';
+
+// ROUTES
 import helloWordRoutes from './routes/HelloWordRoutes';
+import confirmationRoutes from './routes/ConfirmationRoutes';
+import customerRoutes from './routes/CustomerRoutes';
+import measureRoutes from './routes/MeasureRoutes';
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
-app.use('/api', helloWordRoutes);
+app.use('/api/helloword', helloWordRoutes);
+app.use('/api/confirmation', confirmationRoutes);
+app.use('/api/customer', customerRoutes);
+app.use('/api/measure', measureRoutes);
 
 ConnDB.initialize()
     .then(() => {

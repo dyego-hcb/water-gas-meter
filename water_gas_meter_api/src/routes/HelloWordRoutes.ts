@@ -5,7 +5,7 @@ import HelloWordController from '../controllers/HelloWordController';
 
 const router = express.Router();
 
-router.get('/helloword/check-api', HelloWordController.checkAPIConnection);
-router.get('/helloword/check-db', HelloWordController.checkDBConnection);
+router.get('/check-api', HelloWordController.checkAPIConnection);
+router.get('/check-db', HelloWordController.checkDBConnection);
 
 export default router;

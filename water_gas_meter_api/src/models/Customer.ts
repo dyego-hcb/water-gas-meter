@@ -8,7 +8,9 @@ export class Customer {
     @PrimaryGeneratedColumn()
     id?: number;
 
-    @Column()
+    @Column({
+        unique: true,
+    })
     customer_code?: string;
 
     @OneToMany(() => Measure, measure => measure.customer)
