@@ -1,0 +1,40 @@
+{
+  "name": "water_gas_meter_api",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm src/index.ts",
+    "start:dev": "ts-node src/index.ts",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "typeorm": "typeorm",
+    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync -d src/db/ConnDB.ts",
+    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/db/ConnDB.ts",
+    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/db/ConnDB.ts",
+    "migration:show": "ts-node ./node_modules/typeorm/cli.js migration:show -d src/db/ConnDB.ts",
+    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/db/ConnDB.ts",
+    "migration:create": "ts-node ./node_modules/typeorm/cli.js migration:create",
+    "lint": "eslint . --ext .ts"
+  },
+  "author": "Dyego Henrique Costa Braga",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "reflect-metadata": "^0.1.14",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.1",
+    "nodemon": "^3.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}
