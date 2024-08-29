@@ -6,15 +6,15 @@ import { Measure } from './Measure';
 @Entity()
 export class Customer {
     @PrimaryGeneratedColumn()
-    id?: number;
+    id!: number;
 
     @Column({
         unique: true,
     })
-    customer_code?: string;
+    customer_code!: string;
 
     @OneToMany(() => Measure, measure => measure.customer)
-    measures?: Measure[];
+    measures!: Measure[];
 
     @Column()
     created_at: Date = new Date();

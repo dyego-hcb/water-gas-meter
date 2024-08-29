@@ -12,28 +12,28 @@ export enum MeasureType {
 @Entity()
 export class Measure {
     @PrimaryGeneratedColumn()
-    id?: number;
+    id!: number;
 
     @Column()
-    measure_datetime?: Date;
+    measure_datetime!: Date;
 
     @Column({
         type: 'enum',
         enum: MeasureType
     })
-    measure_type?: MeasureType;
+    measure_type!: MeasureType;
+
+    @Column({ type: 'numeric' })
+    measure_value!: number;
 
     @Column()
-    measure_value?: number;
+    image_url!: string;
 
-    @Column()
-    image_url?: string;
-
-    @ManyToOne(() => Customer, customer => customer.measures)
-    customer?: Customer;
+    @ManyToOne(() => Customer, customer => customer.measures, { nullable: false })
+    customer!: Customer;
 
     @OneToOne(() => Confirmation, confirmation => confirmation.measure)
-    confirmation?: Confirmation;
+    confirmation!: Confirmation;
 
     @Column()
     created_at: Date = new Date();

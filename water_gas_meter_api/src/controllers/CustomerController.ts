@@ -1,5 +1,3 @@
-// src/controllers/CustomerController.ts
-
 import { Request, Response } from 'express';
 
 // SERVICES
@@ -23,7 +21,11 @@ class CustomerController {
 
     static async getCustomerById(req: Request, res: Response) {
         const { id } = req.params;
-        const idNumber = parseInt(id);
+        const idNumber = parseInt(id, 10);
+        if (isNaN(idNumber)) {
+            return res.status(400).send('Invalid customer ID');
+        }
+
         try {
             const customer = await CustomerServices.getCustomerById(idNumber);
             if (customer) {
@@ -39,6 +41,10 @@ class CustomerController {
 
     static async getCustomerByCustomerCode(req: Request, res: Response) {
         const { customer_code } = req.params;
+        if (!customer_code) {
+            return res.status(400).send('Customer code is required');
+        }
+
         try {
             const customer = await CustomerServices.getCustomerByCustomerCode(customer_code);
             if (customer) {
@@ -53,7 +59,12 @@ class CustomerController {
     }
 
     static async createCustomer(req: Request, res: Response) {
-        const data = new CreateCustomerDTO(req.body.customer_code);
+        const { customer_code } = req.body;
+        if (!customer_code) {
+            return res.status(400).send('Customer code is required');
+        }
+
+        const data = new CreateCustomerDTO(customer_code);
         try {
             const newCustomer = await CustomerServices.createCustomer(data);
             res.status(201).json(newCustomer);
@@ -65,8 +76,17 @@ class CustomerController {
 
     static async updateCustomer(req: Request, res: Response) {
         const { id } = req.params;
-        const idNumber = parseInt(id);
-        const data = new UpdateCustomerDTO(req.body.customer_code);
+        const idNumber = parseInt(id, 10);
+        if (isNaN(idNumber)) {
+            return res.status(400).send('Invalid customer ID');
+        }
+
+        const { customer_code } = req.body;
+        if (!customer_code) {
+            return res.status(400).send('Customer code is required');
+        }
+
+        const data = new UpdateCustomerDTO(customer_code);
         try {
             const updatedCustomer = await CustomerServices.updateCustomer(idNumber, data);
             if (updatedCustomer) {
@@ -82,7 +102,11 @@ class CustomerController {
 
     static async deleteCustomer(req: Request, res: Response) {
         const { id } = req.params;
-        const idNumber = parseInt(id);
+        const idNumber = parseInt(id, 10);
+        if (isNaN(idNumber)) {
+            return res.status(400).send('Invalid customer ID');
+        }
+
         try {
             const isDeleted = await CustomerServices.deleteCustomer(idNumber);
             if (isDeleted) {

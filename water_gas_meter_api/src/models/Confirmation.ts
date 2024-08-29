@@ -6,17 +6,17 @@ import { Measure } from './Measure';
 @Entity()
 export class Confirmation {
     @PrimaryGeneratedColumn()
-    id?: number;
+    id!: number;
+
+    @Column({ type: 'numeric' })
+    confirmed_value!: number;
 
     @Column()
-    confirmed_value?: number;
-
-    @Column()
-    confirmed_at?: Date;
+    confirmed_at!: Date;
 
     @OneToOne(() => Measure, measure => measure.confirmation)
     @JoinColumn()
-    measure?: Measure;
+    measure!: Measure;
 
     @Column()
     created_at: Date = new Date();
