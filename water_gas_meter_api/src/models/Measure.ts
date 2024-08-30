@@ -14,6 +14,11 @@ export class Measure {
     @PrimaryGeneratedColumn()
     id!: number;
 
+    @Column({
+        unique: true,
+    })
+    measure_uuid!: string;
+
     @Column()
     measure_datetime!: Date;
 

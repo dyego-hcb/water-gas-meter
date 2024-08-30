@@ -1,5 +1,9 @@
-import { Customer } from '../models/Customer';
+// src/services/CustomerServices.ts
+
 import { ConnDB } from '../db/ConnDB';
+
+// MODELS
+import { Customer } from '../models/Customer';
 
 // DTOS
 import { CreateCustomerDTO } from '../dtos/customer-dto/CreateCustomerDTO';
@@ -107,6 +111,7 @@ export class CustomerServices {
             throw new Error('Error deleting customer');
         }
     }
+
 }
 
 export default CustomerServices;

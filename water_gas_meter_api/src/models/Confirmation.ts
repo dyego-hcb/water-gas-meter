@@ -12,6 +12,9 @@ export class Confirmation {
     confirmed_value!: number;
 
     @Column()
+    confirmed!: boolean;
+
+    @Column()
     confirmed_at!: Date;
 
     @OneToOne(() => Measure, measure => measure.confirmation)

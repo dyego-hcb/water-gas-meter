@@ -3,7 +3,7 @@
 import { ConnDB } from '../db/ConnDB';
 
 // MODELS
-import { Measure } from '../models/Measure';
+import { Measure, MeasureType } from '../models/Measure';
 import { Customer } from '../models/Customer';
 
 // DTOS
@@ -24,6 +24,7 @@ export class MeasureServices {
 
             return measures.map(measure => new MeasureResponseDTO(
                 measure.id,
+                measure.measure_uuid,
                 measure.measure_datetime,
                 measure.measure_type,
                 measure.measure_value,
@@ -37,6 +38,36 @@ export class MeasureServices {
             throw new Error('Failed to retrieve measures');
         }
     }
+
+    static async getAllMeasuresByCustomerCode(id: number): Promise<MeasureResponseDTO[]> {
+        try {
+
+            const measures = await this.measureRepository.find({
+                where: {
+                    customer: {
+                        id: id
+                    }
+                },
+                relations: ['customer']
+            });
+
+            return measures.map(measure => new MeasureResponseDTO(
+                measure.id,
+                measure.measure_uuid,
+                measure.measure_datetime,
+                measure.measure_type,
+                measure.measure_value,
+                measure.image_url,
+                measure.customer!.id,
+                measure.created_at,
+                measure.updated_at
+            ));
+        } catch (err) {
+            console.error('Error retrieving all measures:', err);
+            throw new Error('Failed to retrieve measures');
+        }
+    }
+
 
     static async getMeasureById(id: number): Promise<MeasureResponseDTO | null> {
         if (isNaN(id)) {
@@ -53,6 +84,37 @@ export class MeasureServices {
 
             return new MeasureResponseDTO(
                 measure.id,
+                measure.measure_uuid,
+                measure.measure_datetime,
+                measure.measure_type,
+                measure.measure_value,
+                measure.image_url,
+                measure.customer!.id,
+                measure.created_at,
+                measure.updated_at
+            );
+        } catch (err) {
+            console.error('Error retrieving measure by ID:', err);
+            throw new Error('Failed to retrieve measure');
+        }
+    }
+
+    static async getMeasureByMeasureUUID(measure_uuid: string): Promise<MeasureResponseDTO | null> {
+        if (!(measure_uuid)) {
+            throw new Error('Invalid measure_uuid');
+        }
+
+        try {
+            const measure = await this.measureRepository.findOne({
+                where: { measure_uuid },
+                relations: ['customer']
+            });
+
+            if (!measure) return null;
+
+            return new MeasureResponseDTO(
+                measure.id,
+                measure.measure_uuid,
                 measure.measure_datetime,
                 measure.measure_type,
                 measure.measure_value,
@@ -113,6 +175,7 @@ export class MeasureServices {
 
             return new MeasureResponseDTO(
                 updatedMeasure.id,
+                measure.measure_uuid,
                 updatedMeasure.measure_datetime,
                 updatedMeasure.measure_type,
                 updatedMeasure.measure_value,
@@ -138,6 +201,26 @@ export class MeasureServices {
         } catch (err) {
             console.error('Error deleting measure:', err);
             throw new Error('Failed to delete measure');
+        }
+    }
+
+    static async findMeasureByMonth(customer_code: string, measure_type: MeasureType, measure_date: Date) {
+        try {
+            const startOfMonth = new Date(measure_date.getFullYear(), measure_date.getMonth(), 1);
+            const endOfMonth = new Date(measure_date.getFullYear(), measure_date.getMonth() + 1, 0);
+
+            return await ConnDB.getRepository(Measure).createQueryBuilder('measure')
+                .innerJoinAndSelect('measure.customer', 'customer')
+                .where('customer.customer_code = :customer_code', { customer_code })
+                .andWhere('measure.measure_type = :measure_type', { measure_type })
+                .andWhere('measure.measure_datetime BETWEEN :startOfMonth AND :endOfMonth', {
+                    startOfMonth,
+                    endOfMonth
+                })
+                .getOne();
+        } catch (err) {
+            console.error('Error finding measure by month:', err);
+            throw new Error('Error finding measure by month');
         }
     }
 }

@@ -2,6 +2,7 @@
 
 import { ConnDB } from '../db/ConnDB';
 
+
 // MODELS
 import { Confirmation } from '../models/Confirmation';
 import { Measure } from '../models/Measure';
@@ -24,6 +25,7 @@ export class ConfirmationServices {
             return confirmations.map(confirmation => new ConfirmationResponseDTO(
                 confirmation.id,
                 confirmation.confirmed_value,
+                confirmation.confirmed,
                 confirmation.confirmed_at,
                 confirmation.measure.id,
                 confirmation.created_at,
@@ -51,6 +53,39 @@ export class ConfirmationServices {
             return new ConfirmationResponseDTO(
                 confirmation.id,
                 confirmation.confirmed_value,
+                confirmation.confirmed,
+                confirmation.confirmed_at,
+                confirmation.measure.id,
+                confirmation.created_at,
+                confirmation.updated_at
+            );
+        } catch (err) {
+            console.error('Error retrieving confirmation by ID:', err);
+            throw new Error('Failed to retrieve confirmation');
+        }
+    }
+
+    static async getConfirmationByMeasureId(measureId: number): Promise<ConfirmationResponseDTO | null> {
+        if (isNaN(measureId)) {
+            throw new Error('Invalid measureId format');
+        }
+
+        try {
+            const confirmation = await this.confirmationRepository.findOne({
+                where: {
+                    measure: {
+                        id: measureId
+                    }
+                },
+                relations: ['measure']
+            });
+
+            if (!confirmation) return null;
+
+            return new ConfirmationResponseDTO(
+                confirmation.id,
+                confirmation.confirmed_value,
+                confirmation.confirmed,
                 confirmation.confirmed_at,
                 confirmation.measure.id,
                 confirmation.created_at,
@@ -78,6 +113,7 @@ export class ConfirmationServices {
             return new ConfirmationResponseDTO(
                 savedConfirmation.id,
                 savedConfirmation.confirmed_value,
+                savedConfirmation.confirmed,
                 savedConfirmation.confirmed_at,
                 savedConfirmation.measure.id,
                 savedConfirmation.created_at,
@@ -115,6 +151,7 @@ export class ConfirmationServices {
             return new ConfirmationResponseDTO(
                 updatedConfirmation.id,
                 updatedConfirmation.confirmed_value,
+                updatedConfirmation.confirmed,
                 updatedConfirmation.confirmed_at,
                 updatedConfirmation.measure.id,
                 updatedConfirmation.created_at,
@@ -137,6 +174,44 @@ export class ConfirmationServices {
         } catch (err) {
             console.error('Error deleting confirmation:', err);
             throw new Error('Failed to delete confirmation');
+        }
+    }
+
+    static async confirmMeasure(id: number, updateConfirmationDTO: UpdateConfirmationDTO): Promise<ConfirmationResponseDTO | null> {
+        if (isNaN(id)) {
+            throw new Error('Invalid ID format');
+        }
+
+        try {
+            const confirmation = await this.confirmationRepository.findOneBy({ id });
+            if (!confirmation) {
+                return null;
+            }
+
+            if (updateConfirmationDTO.measureId) {
+                const measure = await this.measureRepository.findOneBy({ id: updateConfirmationDTO.measureId });
+                if (!measure) {
+                    throw new Error('Measure not found');
+                }
+                confirmation.measure = measure;
+            }
+
+            Object.assign(confirmation, updateConfirmationDTO);
+
+            const updatedConfirmation = await this.confirmationRepository.save(confirmation);
+
+            return new ConfirmationResponseDTO(
+                updatedConfirmation.id,
+                updatedConfirmation.confirmed_value,
+                updatedConfirmation.confirmed,
+                updatedConfirmation.confirmed_at,
+                updatedConfirmation.measure.id,
+                updatedConfirmation.created_at,
+                updatedConfirmation.updated_at
+            );
+        } catch (err) {
+            console.error('Error updating confirmation:', err);
+            throw new Error('Failed to update confirmation');
         }
     }
 }

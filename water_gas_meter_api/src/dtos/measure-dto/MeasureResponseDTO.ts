@@ -1,7 +1,8 @@
 // src/dtos/measure-dto/MeasureResponseDTO.ts
 
 export class MeasureResponseDTO {
-    id!: number;
+    id: number;
+    measure_uuid!: string;
     measure_datetime!: Date;
     measure_type!: string;
     measure_value!: number;
@@ -13,6 +14,7 @@ export class MeasureResponseDTO {
 
     constructor(
         id: number,
+        measure_uuid: string,
         measure_datetime: Date,
         measure_type: string,
         measure_value: number,
@@ -22,6 +24,7 @@ export class MeasureResponseDTO {
         updated_at: Date
     ) {
         this.id = id;
+        this.measure_uuid = measure_uuid;
         this.measure_datetime = measure_datetime;
         this.measure_type = measure_type;
         this.measure_value = measure_value;

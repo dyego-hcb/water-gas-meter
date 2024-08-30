@@ -10,5 +10,6 @@ router.get('/get-by-id/:id', ConfirmationController.getConfirmationById);
 router.post('/register', ConfirmationController.createConfirmation);
 router.put('/edit/:id', ConfirmationController.updateConfirmation);
 router.delete('/delete/:id', ConfirmationController.deleteConfirmation);
+router.patch('/confirm', ConfirmationController.confirmMeasure);
 
 export default router;
