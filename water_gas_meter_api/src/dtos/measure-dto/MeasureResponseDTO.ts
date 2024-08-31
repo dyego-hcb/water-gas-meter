@@ -6,6 +6,7 @@ export class MeasureResponseDTO {
     measure_datetime!: Date;
     measure_type!: string;
     measure_value!: number;
+    image_path!: string;
     image_url!: string;
     customerId!: number;
     confirmationId!: number;
@@ -18,6 +19,7 @@ export class MeasureResponseDTO {
         measure_datetime: Date,
         measure_type: string,
         measure_value: number,
+        image_path: string,
         image_url: string,
         customerId: number,
         created_at: Date,
@@ -28,6 +30,7 @@ export class MeasureResponseDTO {
         this.measure_datetime = measure_datetime;
         this.measure_type = measure_type;
         this.measure_value = measure_value;
+        this.image_path = image_path;
         this.image_url = image_url;
         this.customerId = customerId;
         this.created_at = created_at;

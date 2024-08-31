@@ -19,6 +19,8 @@ import { UploadMesuareDTO } from '../dtos/measure-dto/UploadMesuareDTO';
 // UTILS
 import { isValidDateTime } from '../utils/ValidateDateMeasure';
 import { isValidBase64Image } from '../utils/ValidateBase64Image';
+import { base64ToImage } from '../utils/ConvertBase64ToImage';
+import { saveImage } from '../utils/StoreImage';
 
 class MeasureController {
 
@@ -72,7 +74,7 @@ class MeasureController {
     }
 
     static async createMeasure(req: Request, res: Response) {
-        const { measure_uuid, measure_datetime, measure_type, measure_value, image_url, customerId } = req.body;
+        const { measure_uuid, measure_datetime, measure_type, measure_value, image_path, image_url, customerId } = req.body;
 
         if (!measure_uuid) {
             return res.status(400).send('Invalid measure_uuid');
@@ -93,7 +95,11 @@ class MeasureController {
             return res.status(400).send('Invalid measure_value');
         }
 
-        if (!image_url || !/^https?:\/\/.+\.(jpg|jpeg|png|gif)$/.test(image_url)) {
+        if (!image_path) {
+            return res.status(400).send('Invalid image_path');
+        }
+
+        if (!image_url) {
             return res.status(400).send('Invalid image_url');
         }
 
@@ -101,7 +107,7 @@ class MeasureController {
             return res.status(400).send('Invalid customerId');
         }
 
-        const data = new CreateMeasureDTO(measure_uuid, measure_datetime, measure_type, measure_value, image_url, customerId);
+        const data = new CreateMeasureDTO(measure_uuid, measure_datetime, measure_type, measure_value, image_path, image_url, customerId);
 
         try {
             const newMeasure = await MeasureServices.createMeasure(data);
@@ -118,7 +124,7 @@ class MeasureController {
             return res.status(400).send('Invalid measure ID');
         }
 
-        const { measure_uuid, measure_datetime, measure_type, measure_value, image_url, customerId } = req.body;
+        const { measure_uuid, measure_datetime, measure_type, measure_value, image_path, image_url, customerId } = req.body;
 
         if (!measure_uuid || isNaN(Date.parse(measure_uuid))) {
             return res.status(400).send('Invalid measure_uuid');
@@ -147,7 +153,7 @@ class MeasureController {
             return res.status(400).send('Invalid customerId');
         }
 
-        const data = new UpdateMeasureDTO(measure_uuid, measure_datetime, measure_type, measure_value, image_url, customerId);
+        const data = new UpdateMeasureDTO(measure_uuid, measure_datetime, measure_type, measure_value, image_path, image_url, customerId);
         try {
             const updatedMeasure = await MeasureServices.updateMeasure(id, data);
             if (updatedMeasure) {
@@ -231,7 +237,9 @@ class MeasureController {
         try {
             const imageExtension = imageFile.match(/^data:image\/(png|jpeg|jpg|gif);base64,/i);
             const extension = imageExtension[1];
-            const imageName = `${customer_code} - ${measure_type}.${extension}`;
+            const imageName = `${customer_code}-${measure_type}.${extension}`;
+            const imageBuffer = base64ToImage(imageFile);
+            const savedFilePath = saveImage(imageBuffer, imageName, measure_type);
 
             var customer = await CustomerServices.getCustomerByCustomerCode(customer_code);
             if (!customer) {
@@ -239,9 +247,9 @@ class MeasureController {
                 customer = await CustomerServices.createCustomer(data);
             }
 
-            const geminiResult = await GeminiService.processImage(imageFile, imageName, measure_type);
+            const geminiResult = await GeminiService.processImage(imageFile, imageName, savedFilePath);
 
-            const data = new CreateMeasureDTO(geminiResult.measure_uuid, measure_datetime, measure_type, geminiResult.measure_value, geminiResult.image_url, customer.id);
+            const data = new CreateMeasureDTO(geminiResult.measure_uuid, measure_datetime, measure_type, geminiResult.measure_value, savedFilePath, geminiResult.image_url, customer.id);
 
             const newMeasure = await MeasureServices.createMeasure(data);
 

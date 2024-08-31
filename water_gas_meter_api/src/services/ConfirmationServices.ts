@@ -65,8 +65,8 @@ export class ConfirmationServices {
         }
     }
 
-    static async getConfirmationByMeasureId(measureId: number): Promise<ConfirmationResponseDTO | null> {
-        if (isNaN(measureId)) {
+    static async getConfirmationByMeasureId(id: number): Promise<ConfirmationResponseDTO | null> {
+        if (isNaN(id)) {
             throw new Error('Invalid measureId format');
         }
 
@@ -74,7 +74,7 @@ export class ConfirmationServices {
             const confirmation = await this.confirmationRepository.findOne({
                 where: {
                     measure: {
-                        id: measureId
+                        id: id
                     }
                 },
                 relations: ['measure']
@@ -105,6 +105,7 @@ export class ConfirmationServices {
 
         const confirmation = new Confirmation();
         confirmation.confirmed_value = createConfirmationDTO.confirmed_value;
+        confirmation.confirmed = createConfirmationDTO.confirmed;
         confirmation.confirmed_at = createConfirmationDTO.confirmed_at;
         confirmation.measure = measure;
 

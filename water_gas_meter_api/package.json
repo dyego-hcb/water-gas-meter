@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm src/index.ts",
     "start:dev": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
+    "test": "jest",
     "typeorm": "typeorm",
     "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync -d src/db/ConnDB.ts",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/db/ConnDB.ts",
@@ -21,13 +21,18 @@
   "author": "Dyego Henrique Costa Braga",
   "license": "ISC",
   "description": "",
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "@google/generative-ai": "^0.17.1",
-    "axios": "^1.7.5",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "mime-types": "^2.1.35",
+    "node-fetch": "^3.3.2",
     "pg": "^8.12.0",
     "reflect-metadata": "^0.1.14",
     "typeorm": "^0.3.20",
@@ -36,9 +41,15 @@
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/mime-types": "^2.1.4",
     "@types/node": "^22.5.1",
+    "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
+    "jest": "^29.7.0",
     "nodemon": "^3.1.4",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   }

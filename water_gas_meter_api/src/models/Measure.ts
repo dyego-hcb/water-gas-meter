@@ -32,6 +32,9 @@ export class Measure {
     measure_value!: number;
 
     @Column()
+    image_path!: string;
+
+    @Column()
     image_url!: string;
 
     @ManyToOne(() => Customer, customer => customer.measures, { nullable: false })

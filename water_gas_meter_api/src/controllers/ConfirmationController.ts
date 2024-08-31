@@ -87,7 +87,7 @@ class ConfirmationController {
             return res.status(400).send('Invalid measureId');
         }
 
-        const data = new UpdateConfirmationDTO(id, confirmed_value, confirmed, confirmed_at, measureId);
+        const data = new UpdateConfirmationDTO(confirmed_value, confirmed, confirmed_at, measureId);
         try {
             const updatedConfirmation = await ConfirmationServices.updateConfirmation(id, data);
             if (updatedConfirmation) {
@@ -135,14 +135,23 @@ class ConfirmationController {
                 return res.status(404).send('Measure not found');
             }
 
-            const confirmation = await ConfirmationServices.getConfirmationByMeasureId(measure.id);
+            var confirmation = await ConfirmationServices.getConfirmationByMeasureId(measure.id);
 
-            const data = new UpdateConfirmationDTO(confirmation!.id, confirmed_value, true, new Date(), measure.id);
+            const data = new UpdateConfirmationDTO(confirmed_value, true, new Date(), measure.id);
 
-            const confirmedMeasure = await ConfirmationServices.confirmMeasure(confirmation!.id, data);
+            if (confirmation) {
+                console.log('confirmation: ', confirmation);
+                confirmation = await ConfirmationServices.confirmMeasure(confirmation.id, data);
+            } else {
+                const createConfirmationDTO = new CreateConfirmationDTO(confirmed_value, false, new Date(), measure.id);
 
-            if (confirmedMeasure) {
-                res.status(200).json(confirmedMeasure.confirmed);
+                confirmation = await ConfirmationServices.createConfirmation(createConfirmationDTO);
+                confirmation = await ConfirmationServices.confirmMeasure(confirmation.id, data);
+                console.log('confirmation: ', confirmation);
+            }
+
+            if (confirmation) {
+                res.status(200).json(confirmation.confirmed);
             } else {
                 res.status(404).send('Confirmation not found');
             }
